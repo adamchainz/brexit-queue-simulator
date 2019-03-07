@@ -7,39 +7,39 @@ class Queue:
         self.size = size
         self.delay_range = delay_range
         self.ready_time = None
-        self.length = 0
         self.feeder_queue = feeder_queue
+        self.queue = []
 
     def update_delay_range(self, delay_range):
         self.delay_range = delay_range
 
     def handle_new(self):
-        self.ready_time = time.monotonic() + random.randint(6, 9)
+        self.ready_time = time.monotonic() + random.randint(*delay_range)
     
-    def add(self):
+    def add(self, item):
         self.check_complete()
-        if self.length < self.size:
-            self.length += 1
-            if self.length == 1:
+        if len(self.queue) < self.size:
+            self.queue.append(item)
+            if len(self.queue) == 1:
                 self.handle_new()
             return True
         return False
 
     def pop(self):
-        if self.length > 0:
-            self.length -= 1
-            return True
+        if self.queue:
+            return self.queue.pop(0)
         return False
 
     def check_complete(self):
-        if (self.ready_time and self.length and
+        if (self.ready_time and self.queue and
             time.monotonic() >= self.ready_time):
-            self.length -=1
-            if self.length > 0:
+            self.queue.pop(0)
+            if self.queue:
                 self.handle_new()
             else:
-                self.ready_time = 0
-        if self.length < self.size and self.feeder_queue:
-            if self.feeder_queue.pop():
-                self.length += 1
+                self.ready_time = None
+        if len(self.queue) < self.size and self.feeder_queue:
+            item = self.feeder_queue.pop()
+            if item:
+                self.queue.append(item)
                 self.handle_new()
