@@ -3,19 +3,24 @@ import time
 
 
 class Queue:
-    def __init__(self, size, delay_range, feeder_queue=None):
+    def __init__(self, size, delay_range=None, feeder_queue=None):
         self.size = size
         self.delay_range = delay_range
         self.ready_time = None
         self.feeder_queue = feeder_queue
         self.queue = []
 
+    @property
+    def length(self):
+        return len(self.queue)
+
     def update_delay_range(self, delay_range):
         self.delay_range = delay_range
 
     def handle_new(self):
-        self.ready_time = time.monotonic() + random.randint(
-            *self.delay_range)
+        if self.delay_range is not None:
+            self.ready_time = time.monotonic() + random.randint(
+                *self.delay_range)
     
     def add(self, item):
         self.check_complete()
@@ -39,8 +44,10 @@ class Queue:
                 self.handle_new()
             else:
                 self.ready_time = None
-        if len(self.queue) < self.size and self.feeder_queue:
+        while self.feeder_queue and len(self.queue) < self.size:
             item = self.feeder_queue.pop()
-            if item:
-                self.queue.append(item)
+            if not item:
+                break
+            self.queue.append(item)
+            if len(self.queue) == 1:
                 self.handle_new()
