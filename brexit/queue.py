@@ -14,7 +14,7 @@ class Queue:
         self.delay_range = delay_range
 
     def handle_new(self):
-        self.ready_time = time.monotonic() + random.randint(6, 9)
+        self.ready_time = time.monotonic() + random.randint(*delay_range)
     
     def add(self):
         self.check_complete()
