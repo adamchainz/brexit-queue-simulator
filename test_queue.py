@@ -26,6 +26,15 @@ class TestQueue(unittest.TestCase):
         time.sleep(3)
         self.assertTrue(queue.add(4))
 
+    def test_pop_empty_queue(self):
+        queue = Queue(3)
+        self.assertFalse(queue.pop())
+
+    def test_pop_nonempty_queue(self):
+        queue = Queue(3)
+        queue.add(1)
+        self.assertEquals(1, queue.pop())
+
 
 class TestConnectedQueues(unittest.TestCase):
 
@@ -45,6 +54,23 @@ class TestConnectedQueues(unittest.TestCase):
         customs_queue.check_complete()
         self.assertEquals(0, feeder_queue.length)
         self.assertEquals(2, customs_queue.length)
+
+
+class TestParallelConnectedQueues(unittest.TestCase):
+
+    def test_add_4_to_feeder_queue_then_check_complete_pulls_items_to_connected_queues(self):
+        feeder_capacity = 4
+        feeder_queue = Queue(feeder_capacity)
+        customs_queue_1 = Queue(3, delay_range=(1, 2), feeder_queue=feeder_queue)
+        customs_queue_2 = Queue(3, delay_range=(1, 2), feeder_queue=feeder_queue)
+        for truck in range(feeder_capacity):
+            feeder_queue.add(truck+1)
+        customs_queue_1.check_complete()
+        customs_queue_2.check_complete()
+        self.assertEquals(0, feeder_queue.length)
+        self.assertEquals(3, customs_queue_1.length)
+        self.assertEquals(1, customs_queue_2.length)
+
 
 
 if __name__ == "__main__":

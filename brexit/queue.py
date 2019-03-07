@@ -23,6 +23,7 @@ class Queue:
                 *self.delay_range)
     
     def add(self, item):
+        assert item
         self.check_complete()
         if len(self.queue) < self.size:
             self.queue.append(item)
