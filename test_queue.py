@@ -72,6 +72,17 @@ class TestParallelConnectedQueues(unittest.TestCase):
         self.assertEquals(1, customs_queue_2.length)
 
 
+class TestUpdateDelayRange(unittest.TestCase):
+
+    def test_enabling_delay_range(self):
+        queue = Queue(3)
+        queue.add(1)
+        time.sleep(3)
+        self.assertEquals(1, queue.length)
+        queue.update_delay_range((1, 2))
+        time.sleep(3)
+        self.assertEquals(1, queue.length)
+
 
 if __name__ == "__main__":
     unittest.main()

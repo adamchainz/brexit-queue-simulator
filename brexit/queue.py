@@ -16,6 +16,8 @@ class Queue:
 
     def update_delay_range(self, delay_range):
         self.delay_range = delay_range
+        if self.queue and not self.ready_time:
+            self.handle_new()
 
     def handle_new(self):
         if self.delay_range is not None:
