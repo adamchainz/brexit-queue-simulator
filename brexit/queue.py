@@ -10,6 +10,10 @@ class Queue:
         self.feeder_queue = feeder_queue
         self.queue = []
 
+    @property
+    def length(self):
+        return len(self.queue)
+
     def update_delay_range(self, delay_range):
         self.delay_range = delay_range
 
@@ -40,8 +44,10 @@ class Queue:
                 self.handle_new()
             else:
                 self.ready_time = None
-        if len(self.queue) < self.size and self.feeder_queue:
+        while self.feeder_queue and len(self.queue) < self.size:
             item = self.feeder_queue.pop()
-            if item:
-                self.queue.append(item)
+            if not item:
+                break
+            self.queue.append(item)
+            if len(self.queue) == 1:
                 self.handle_new()

@@ -26,5 +26,26 @@ class TestQueue(unittest.TestCase):
         time.sleep(3)
         self.assertTrue(queue.add(4))
 
+
+class TestConnectedQueues(unittest.TestCase):
+
+    def test_add_to_feeder_queue_then_check_complete_pulls_item_to_second_queue(self):
+        feeder_queue = Queue(5)
+        customs_queue = Queue(3, delay_range=(1, 2), feeder_queue=feeder_queue)
+        feeder_queue.add(1)
+        customs_queue.check_complete()
+        self.assertEquals(0, feeder_queue.length)
+        self.assertEquals(1, customs_queue.length)
+
+    def test_add_two_to_feeder_queue_then_check_complete_pulls_items_to_second_queue(self):
+        feeder_queue = Queue(5)
+        customs_queue = Queue(3, delay_range=(1, 2), feeder_queue=feeder_queue)
+        feeder_queue.add(1)
+        feeder_queue.add(2)
+        customs_queue.check_complete()
+        self.assertEquals(0, feeder_queue.length)
+        self.assertEquals(2, customs_queue.length)
+
+
 if __name__ == "__main__":
     unittest.main()
